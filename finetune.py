@@ -11,9 +11,6 @@ from transformers import TrainingArguments
 
 from modeling_chatglm import ChatGLMForConditionalGeneration
 
-tokenizer = AutoTokenizer.from_pretrained("../../pretrained_models/chatglm-6b", trust_remote_code=True)
-
-
 @dataclass
 class FinetuneArguments:
     dataset_path: str = field(default="data/alpaca")
@@ -61,7 +58,7 @@ def get_masks_and_position_ids(
     return attention_mask, position_ids
 
 
-def data_collator(features: list) -> dict:
+def data_collator(features: list, eos_token_id: int) -> dict:
     len_ids = [len(feature["input_ids"]) for feature in features]
     longest = max(len_ids) + 1
     input_ids = []
@@ -74,10 +71,10 @@ def data_collator(features: list) -> dict:
         labels = (
                 [-100] * (seq_len - 1)
                 + ids[(seq_len - 1):]
-                + [tokenizer.eos_token_id]
+                + [eos_token_id]
                 + [-100] * (longest - ids_l - 1)
         )
-        ids = ids + [tokenizer.eos_token_id] * (longest - ids_l)
+        ids = ids + [eos_token_id] * (longest - ids_l)
         _ids = torch.LongTensor(ids)
         attention_mask, position_ids = get_masks_and_position_ids(
             ids, seq_len, longest, _ids.device, gmask=False
@@ -120,12 +117,18 @@ def main():
         (FinetuneArguments, TrainingArguments)
     ).parse_args_into_dataclasses()
 
+    tokenizer = AutoTokenizer.from_pretrained("../../pretrained_models/chatglm-6b", trust_remote_code=True)
     # init model
+    device_map = {"": int(os.environ.get("LOCAL_RANK") or 0)}
     model = ChatGLMForConditionalGeneration.from_pretrained(
-        "../../pretrained_models/chatglm-6b", load_in_8bit=True, trust_remote_code=True, device_map="auto"
+        "../../pretrained_models/chatglm-6b", load_in_8bit=False, trust_remote_code=True, device_map=device_map
     )
 
-    model.gradient_checkpointing_enable()
+    # model = ChatGLMForConditionalGeneration.from_pretrained(
+    #     "../../pretrained_models/chatglm-6b", load_in_8bit=True, trust_remote_code=True, device_map=device_map
+    # )
+
+    # model.gradient_checkpointing_enable()
     model.enable_input_require_grads()
     model.is_parallelizable = True
     model.model_parallel = True
@@ -156,7 +159,7 @@ def main():
         model=model,
         train_dataset=dataset,
         args=training_args,
-        data_collator=data_collator,
+        data_collator=lambda b: data_collator(b, tokenizer.eos_token_id),
     )
     trainer.train()
 
