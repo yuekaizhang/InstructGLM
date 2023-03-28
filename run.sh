@@ -19,16 +19,17 @@ dataset_name=BelleGroup/generated_train_1M_CN
 #     --save_path $data_path \
 #     --max_seq_length $max_seq_length # for input or output, rather than input+output
 
-git-lfs install
-git clone https://huggingface.co/datasets/yuekai/belle_1M_and_alpaca_cleaned.git data
+# git-lfs install
+# git clone https://huggingface.co/datasets/yuekai/belle_1M_and_alpaca_cleaned.git data
 
-
+model_path=/mnt/samsung-t7/yuekai/llm/models/chatglm-6b
 torchrun --nproc_per_node=4 finetune.py \
     --dataset_path $data_path \
     --lora_rank 8 \
     --per_device_train_batch_size 2 \
     --gradient_accumulation_steps 1 \
     --num_train_epochs 1 \
+    --model_path $model_path \
     --save_steps 1000 \
     --save_total_limit 2 \
     --learning_rate 2e-5 \

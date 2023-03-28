@@ -14,7 +14,7 @@ from modeling_chatglm import ChatGLMForConditionalGeneration
 @dataclass
 class FinetuneArguments:
     dataset_path: str = field(default="data/alpaca")
-    model_path: str = field(default="output")
+    model_path: str = field(default="THUDM/chatglm-6b")
     lora_rank: int = field(default=8)
     is_resume: bool = field(default=False)
     resume_path: str = field(default='output/alpaca_output', )
@@ -116,12 +116,12 @@ def main():
     finetune_args, training_args = HfArgumentParser(
         (FinetuneArguments, TrainingArguments)
     ).parse_args_into_dataclasses()
-
-    tokenizer = AutoTokenizer.from_pretrained("../../pretrained_models/chatglm-6b", trust_remote_code=True)
+    # init tokenizer
+    tokenizer = AutoTokenizer.from_pretrained(finetune_args.model_path, trust_remote_code=True)
     # init model
     device_map = {"": int(os.environ.get("LOCAL_RANK") or 0)}
     model = ChatGLMForConditionalGeneration.from_pretrained(
-        "../../pretrained_models/chatglm-6b", load_in_8bit=False, trust_remote_code=True, device_map=device_map
+        finetune_args.model_path, load_in_8bit=False, trust_remote_code=True, device_map=device_map
     )
 
     # model = ChatGLMForConditionalGeneration.from_pretrained(
