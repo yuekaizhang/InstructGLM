@@ -117,7 +117,8 @@ def main():
         (FinetuneArguments, TrainingArguments)
     ).parse_args_into_dataclasses()
     # init tokenizer
-    tokenizer = AutoTokenizer.from_pretrained(finetune_args.model_path, trust_remote_code=True)
+    # tokenizer = AutoTokenizer.from_pretrained(finetune_args.model_path, trust_remote_code=True)
+    tokenizer = AutoTokenizer.from_pretrained('THUDM/chatglm-6b', trust_remote_code=True)
     # init model
     device_map = {"": int(os.environ.get("LOCAL_RANK") or 0)}
     model = ChatGLMForConditionalGeneration.from_pretrained(
