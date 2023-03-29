@@ -1,9 +1,9 @@
 
-MODEL=../../model/llama-7b-hf
+MODEL=../../../model/llama-7b-hf
 FSDP_LAYER=LlamaDecoderLayer
 
 
-DATA=../../data/alpaca_cleaned/alpaca_data_cleaned.json
+DATA=../../../data/alpaca-cleaned/alpaca_data_cleaned.json
 
 EXE=./train.py
 GPUS=8
