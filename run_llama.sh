@@ -42,4 +42,4 @@ torchrun --nproc_per_node=${GPUS} --master_port=5999 ${EXE} \
   --lr_scheduler_type cosine \
   --logging_steps 5 \
   --fsdp 'full_shard auto_wrap' \
-  --fsdp_transformer_layer_cls_to_wrap '${FSDP_LAYER}'"
+  --fsdp_transformer_layer_cls_to_wrap '${FSDP_LAYER}'

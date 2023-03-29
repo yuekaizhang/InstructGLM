@@ -22,8 +22,8 @@ dataset_name=BelleGroup/generated_train_1M_CN
 # git-lfs install
 # git clone https://huggingface.co/datasets/yuekai/belle_1M_and_alpaca_cleaned.git data
 
-model_path=/mnt/samsung-t7/yuekai/llm/models/chatglm-6b
-torchrun --nproc_per_node=4 finetune.py \
+model_path=../../model/chatglm-6b
+torchrun --nproc_per_node=8 finetune.py \
     --dataset_path $data_path \
     --lora_rank 8 \
     --per_device_train_batch_size 2 \
