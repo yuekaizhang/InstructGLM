@@ -2,7 +2,7 @@ torchrun --nproc_per_node=8 finetune.py \
         --base_model '../../model/llama-7b-hf' \
         --data_path '../../data/alpaca-cleaned' \
         --output_dir './lora-alpaca' \
-        --batch_size 16 \
+        --batch_size 512 \
         --micro_batch_size 16 \
         --num_epochs 3 \
         --learning_rate 1e-4 \
